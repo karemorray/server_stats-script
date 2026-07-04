@@ -1,0 +1,177 @@
+#!/bin/bash
+
+echo "=============================="
+echo "Linux Health Check Report"
+echo "hostname	:$(hostname)"
+echo "Date	:$(date)"
+echo "=============================="
+
+check_cpu() {
+  echo ""
+  echo "==========CPU==============="
+  uptime
+  echo ""
+  top -bn1 | head -15
+}
+
+check_memory() {
+  echo ""
+  echo "===========Memory==========="
+  free -h
+  echo ""
+  vmstat 1 4
+}
+
+check_disk() {
+  echo ""
+  echo "==========Disk Usage========"
+  df -hT
+  echo ""
+  echo "=======inode Usage=========="
+  df -i
+  ls -i
+}
+
+check_load() {
+  echo ""
+  echo "========Load Avarage========="
+  cat /proc/loadavg
+  uptime
+}
+
+check_process() {
+  echo ""
+  echo "========Top CPU Processes====="
+  ps -eo pid,user,%mem,%cpu --sort=%mem | head
+  
+  echo ""
+  echo "=======Top Memory Processes===" 
+  ps -eo pid,user,%mem,%cpu --sort=%cpu | head
+
+}
+
+check_services() {
+  echo ""
+  echo "=========Failed Services====="
+  systemctl --failed
+  
+  echo ""
+  echo "=========Running Services====="
+  systemctl list-units --type=service --state=running | head -20
+  
+}
+
+check_network() {
+  echo ""
+  echo "========Network Interfaces====="
+  ip a
+  
+  echo ""
+  echo "Routing Table"
+  ip route
+  
+  echo ""
+  echo "======Listening Ports=========="
+  ss -tulpn
+  
+}
+
+check_dns() {
+  echo ""
+  echo "========Checking DNS==========="
+  cat /etc/resolv.conf
+  
+  echo ""
+  nslookup google.com
+
+}
+
+check_filesystem() {
+  echo ""
+  echo "============Mounts=============="
+  mount | column -t
+  
+  echo ""
+  echo "===========Block devices========"
+  lsblk
+
+}
+
+check_logs() {
+  echo ""
+  echo "====Last 15 Kernel logs========="
+  dmesg | last -15
+
+  echo ""
+  echo "======Last 15 system Errors====="
+  journalctl -p err -n 15 --no-pager
+
+}
+
+check_oom() {
+  echo ""
+  echo "=======OOM Events================"
+  dmesg |grep -i "killed process"
+  dmesg |grep -i oom
+
+}
+
+check_io() {
+  echo ""
+  echo "========IOSTAT==================="
+  iostat -x 1 2
+
+}
+
+check_openfiles() {
+  echo ""
+  echo "===========Open Files============="
+  lsof | head
+
+}
+
+check_time() {
+  echo ""
+  echo "===========Time Check============="
+  timedatectl
+
+}
+
+summary() {
+  echo ""
+  echo "=================================="
+  echo "Health check done"
+  echo "Review the above outputs for:"
+  echo "-CPU "
+  echo "-Memory"
+  echo "-Swap"
+  echo "-Disk"
+  echo "-Failed services"
+  echo "-Network"
+  echo "-Kernel"
+  echo "-OOM events"
+  echo "-Load average"
+  echo "=================================="
+  
+}
+
+main() {
+  check_cpu
+  check_memory
+  check_disk
+  check_load
+  check_process
+  check_services
+  check_network
+  check_dns
+  check_filesystem
+  check_logs
+  check_oom
+  check_io
+  check_openfiles
+  check_time
+  summary
+  
+}
+
+main
