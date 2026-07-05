@@ -1,11 +1,13 @@
 #!/bin/bash
 
-echo "=============================="
-echo "Linux Health Check Report"
-echo "hostname	:$(hostname)"
-echo "Date	:$(date)"
-echo "=============================="
+echo "##################################"
+echo "Linux Health Check Report"       #
+echo "hostname	:$(hostname)"          #
+echo "Date	:$(date)"                  #
+echo "Written by Yogindra Karemorray"  #
+echo "##################################"
 
+set -eu
 check_cpu() {
   echo ""
   echo "==========CPU==============="
